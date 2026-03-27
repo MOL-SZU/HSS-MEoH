@@ -1,0 +1,13 @@
+{
+    "generation": 12,
+    "analysis": "The stronger heuristics employ multi\u2010stage approaches that combine fast greedy selection with localized exact-refinement, leveraging lazy evaluation, pre-computed Monte Carlo samples, and Pareto/pruning techniques to minimize redundant computations. They use vectorized operations and heap-based lazy updates for marginal gains, striking a balance between quality and speed, whereas the weaker ones often rely on more exhaustive or less efficient swap and recomputation strategies.",
+    "experience": "Focus on reusing intermediate data (e.g., pre-computed masks and samples), implement lazy updates to avoid full re-evaluations, and incorporate quick filtering (like Pareto/pruning) to reduce candidate space for subsequent precise refinements.",
+    "current_reflection": "Focus on reusing intermediate data (e.g., pre-computed masks and samples), implement lazy updates to avoid full re-evaluations, and incorporate quick filtering (like Pareto/pruning) to reduce candidate space for subsequent precise refinements.",
+    "good_reflections": [],
+    "bad_reflections": [
+        "Focus on candidate pruning, reuse of sampled data, and vectorized incremental updates. Minimize repeated expensive hypervolume calls by using approximate evaluations and limited local refinements on shortlisted candidates.",
+        "Focus on data reuse and vectorized updates. Use shared samples and lazy evaluations for marginal gains while combining aggressive candidate pruning with local refinements to improve both accuracy and runtime.",
+        "Focus on aggressive pruning and vectorized, lazy-updating of contribution estimates. Reuse sampled data for both approximation and local search. Integrate global greedy selection with a focused exact-swap phase on a shortlist to cut overhead while still polishing hypervolume performance."
+    ],
+    "comprehensive_reflection": "\u2022 Keywords: Reuse, lazy updates, quick filtering, Pareto pruning.  \n\u2022 Advice: Reuse intermediate data (e.g., pre-computed masks and samples) and perform lazy updates to avoid complete re-evaluations.  \n\u2022 Avoid: Extensive full-scale re-evaluations and heavy reliance on global candidate evaluation without initial filtering.  \n\u2022 Explanation: Combining incremental updates with early candidate pruning reduces computational load by narrowing the search space for precise refinements, thereby optimizing runtime and accuracy."
+}

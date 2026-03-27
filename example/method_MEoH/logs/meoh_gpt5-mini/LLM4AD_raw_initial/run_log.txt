@@ -1,0 +1,107 @@
+[2026-02-08 00:23:31] profile.py(255) : ====================================================================
+[2026-02-08 00:23:31] profile.py(256) : LLM Parameters
+[2026-02-08 00:23:31] profile.py(257) : --------------------------------------------------------------------
+[2026-02-08 00:23:31] profile.py(258) :   - LLM: HttpsApi
+[2026-02-08 00:23:31] profile.py(261) :   - do_auto_trim: True
+[2026-02-08 00:23:31] profile.py(261) :   - debug_mode: False
+[2026-02-08 00:23:31] profile.py(261) :   - _host: www.dmxapi.cn
+[2026-02-08 00:23:31] profile.py(261) :   - _key: sk-Bf6yC0nmwmn5sBSN9QHlshTIqUEkGRsWvyi5s1Enlgt6qU55
+[2026-02-08 00:23:31] profile.py(261) :   - _model: gpt-5-mini
+[2026-02-08 00:23:31] profile.py(261) :   - _timeout: 240
+[2026-02-08 00:23:31] profile.py(261) :   - _kwargs: {}
+[2026-02-08 00:23:31] profile.py(261) :   - _cumulative_error: 0
+[2026-02-08 00:23:31] profile.py(262) : ====================================================================
+[2026-02-08 00:23:31] profile.py(263) : Problem Parameters
+[2026-02-08 00:23:31] profile.py(264) : --------------------------------------------------------------------
+[2026-02-08 00:23:31] profile.py(265) :   - Problem: HSS_Evaluation
+[2026-02-08 00:23:31] profile.py(268) :   - task_description: 
+    The definition of HV is as follows: There are some points in space, which serve as the vertices of a box. They share a common vertex, called the reference point. Therefore, each point and the reference point determine the box corresponding to that point. Every point corresponds to a box, and now these boxes may overlap with each other. HV is the size of the union formed by all these boxes.
+    Now, You are an expert machine learning researcher specializing in high-dimensional data analysis and subset selection.
+    Implement a function that uses a constructive heuristic method to select k points from n points such that the hypervolume formed between the selected points and a reference point is maximized. The function should take the coordinates of all points, the number of points to select, and the reference point as input, and return an array consisting of the selected points.
+    You can optimize it from two aspects: execution time and execution result.
+    
+[2026-02-08 00:23:31] profile.py(268) :   - use_numba_accelerate: False
+[2026-02-08 00:23:31] profile.py(268) :   - use_protected_div: False
+[2026-02-08 00:23:31] profile.py(268) :   - protected_div_delta: 1e-05
+[2026-02-08 00:23:31] profile.py(268) :   - random_seed: None
+[2026-02-08 00:23:31] profile.py(268) :   - timeout_seconds: 60
+[2026-02-08 00:23:31] profile.py(268) :   - exec_code: True
+[2026-02-08 00:23:31] profile.py(268) :   - safe_evaluate: True
+[2026-02-08 00:23:31] profile.py(268) :   - daemon_eval_process: False
+[2026-02-08 00:23:31] profile.py(268) :   - fork_proc: auto
+[2026-02-08 00:23:31] profile.py(268) :   - k: 8
+[2026-02-08 00:23:31] profile.py(270) : ====================================================================
+[2026-02-08 00:23:31] profile.py(271) : Method Parameters
+[2026-02-08 00:23:31] profile.py(272) : --------------------------------------------------------------------
+[2026-02-08 00:23:31] profile.py(273) :   - Method: MEoH
+[2026-02-08 00:23:31] profile.py(277) :   - _num_objs: 2
+[2026-02-08 00:23:31] profile.py(277) :   - _max_generations: 300
+[2026-02-08 00:23:31] profile.py(277) :   - _max_sample_nums: 300
+[2026-02-08 00:23:31] profile.py(277) :   - _pop_size: 10
+[2026-02-08 00:23:31] profile.py(277) :   - _selection_num: 2
+[2026-02-08 00:23:31] profile.py(277) :   - _use_e2_operator: True
+[2026-02-08 00:23:31] profile.py(277) :   - _use_m1_operator: True
+[2026-02-08 00:23:31] profile.py(277) :   - _use_m2_operator: True
+[2026-02-08 00:23:31] profile.py(277) :   - _num_samplers: 4
+[2026-02-08 00:23:31] profile.py(277) :   - _num_evaluators: 4
+[2026-02-08 00:23:31] profile.py(277) :   - _resume_mode: False
+[2026-02-08 00:23:31] profile.py(277) :   - _initial_sample_num: None
+[2026-02-08 00:23:31] profile.py(277) :   - _debug_mode: False
+[2026-02-08 00:23:31] profile.py(277) :   - _multi_thread_or_process_eval: thread
+[2026-02-08 00:23:31] profile.py(277) :   - _function_to_evolve_name: HSS
+[2026-02-08 00:23:31] profile.py(279) : =====================================================================
+[2026-03-06 22:47:01] profile.py(255) : ====================================================================
+[2026-03-06 22:47:01] profile.py(256) : LLM Parameters
+[2026-03-06 22:47:01] profile.py(257) : --------------------------------------------------------------------
+[2026-03-06 22:47:01] profile.py(258) :   - LLM: HttpsApi
+[2026-03-06 22:47:01] profile.py(261) :   - do_auto_trim: True
+[2026-03-06 22:47:01] profile.py(261) :   - debug_mode: False
+[2026-03-06 22:47:01] profile.py(261) :   - _host: www.dmxapi.cn
+[2026-03-06 22:47:01] profile.py(261) :   - _key: sk-Bf6yC0nmwmn5sBSN9QHlshTIqUEkGRsWvyi5s1Enlgt6qU55
+[2026-03-06 22:47:01] profile.py(261) :   - _model: gpt-5-mini
+[2026-03-06 22:47:01] profile.py(261) :   - _timeout: 240
+[2026-03-06 22:47:01] profile.py(261) :   - _kwargs: {}
+[2026-03-06 22:47:01] profile.py(261) :   - _cumulative_error: 0
+[2026-03-06 22:47:01] profile.py(262) : ====================================================================
+[2026-03-06 22:47:01] profile.py(263) : Problem Parameters
+[2026-03-06 22:47:01] profile.py(264) : --------------------------------------------------------------------
+[2026-03-06 22:47:01] profile.py(265) :   - Problem: HSS_Evaluation
+[2026-03-06 22:47:01] profile.py(268) :   - task_description: 
+    The definition of HV is as follows: There are some points in space, which serve as the vertices of a box. They share a common vertex, called the reference point. Therefore, each point and the reference point determine the box corresponding to that point. Every point corresponds to a box, and now these boxes may overlap with each other. HV is the size of the union formed by all these boxes.
+    Now, You are an expert machine learning researcher specializing in high-dimensional data analysis and subset selection.
+    Implement a function that uses a constructive heuristic method to select k points from n points such that the hypervolume formed between the selected points and a reference point is maximized. The function should take the coordinates of all points, the number of points to select, and the reference point as input, and return an array consisting of the selected points.
+    You can optimize it from two aspects: execution time and execution result.
+    
+[2026-03-06 22:47:01] profile.py(268) :   - use_numba_accelerate: False
+[2026-03-06 22:47:01] profile.py(268) :   - use_protected_div: False
+[2026-03-06 22:47:01] profile.py(268) :   - protected_div_delta: 1e-05
+[2026-03-06 22:47:01] profile.py(268) :   - random_seed: None
+[2026-03-06 22:47:01] profile.py(268) :   - timeout_seconds: 60
+[2026-03-06 22:47:01] profile.py(268) :   - exec_code: True
+[2026-03-06 22:47:01] profile.py(268) :   - safe_evaluate: True
+[2026-03-06 22:47:01] profile.py(268) :   - daemon_eval_process: False
+[2026-03-06 22:47:01] profile.py(268) :   - fork_proc: auto
+[2026-03-06 22:47:01] profile.py(268) :   - k: 8
+[2026-03-06 22:47:01] profile.py(270) : ====================================================================
+[2026-03-06 22:47:01] profile.py(271) : Method Parameters
+[2026-03-06 22:47:01] profile.py(272) : --------------------------------------------------------------------
+[2026-03-06 22:47:01] profile.py(273) :   - Method: MEoH
+[2026-03-06 22:47:01] profile.py(277) :   - _num_objs: 2
+[2026-03-06 22:47:01] profile.py(277) :   - _max_generations: 300
+[2026-03-06 22:47:01] profile.py(277) :   - _max_sample_nums: 300
+[2026-03-06 22:47:01] profile.py(277) :   - _pop_size: 10
+[2026-03-06 22:47:01] profile.py(277) :   - _selection_num: 2
+[2026-03-06 22:47:01] profile.py(277) :   - _use_e2_operator: True
+[2026-03-06 22:47:01] profile.py(277) :   - _use_m1_operator: True
+[2026-03-06 22:47:01] profile.py(277) :   - _use_m2_operator: True
+[2026-03-06 22:47:01] profile.py(277) :   - _use_p1_operator: True
+[2026-03-06 22:47:01] profile.py(277) :   - _use_t1_operator: True
+[2026-03-06 22:47:01] profile.py(277) :   - _num_samplers: 4
+[2026-03-06 22:47:01] profile.py(277) :   - _num_evaluators: 4
+[2026-03-06 22:47:01] profile.py(277) :   - _resume_mode: True
+[2026-03-06 22:47:01] profile.py(277) :   - _resume_direction: None
+[2026-03-06 22:47:01] profile.py(277) :   - _initial_sample_num: None
+[2026-03-06 22:47:01] profile.py(277) :   - _debug_mode: False
+[2026-03-06 22:47:01] profile.py(277) :   - _multi_thread_or_process_eval: thread
+[2026-03-06 22:47:01] profile.py(277) :   - _function_to_evolve_name: HSS
+[2026-03-06 22:47:01] profile.py(279) : =====================================================================

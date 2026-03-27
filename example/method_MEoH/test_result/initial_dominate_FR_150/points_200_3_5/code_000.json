@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "avg_hv": -Infinity,
+    "avg_time": Infinity,
+    "num_files": 0
+  },
+  "details": [
+    {
+      "file": "points_200_3_001_1.722_1.859_0.690.mat",
+      "error": "name 'pg' is not defined"
+    },
+    {
+      "file": "points_200_3_002_0.616_1.776_0.717.mat",
+      "error": "name 'pg' is not defined"
+    },
+    {
+      "file": "points_200_3_003_0.943_1.433_0.571.mat",
+      "error": "name 'pg' is not defined"
+    },
+    {
+      "file": "points_200_3_004_1.349_1.596_1.971.mat",
+      "error": "name 'pg' is not defined"
+    },
+    {
+      "file": "points_200_3_005_1.008_1.884_1.758.mat",
+      "error": "name 'pg' is not defined"
+    }
+  ]
+}

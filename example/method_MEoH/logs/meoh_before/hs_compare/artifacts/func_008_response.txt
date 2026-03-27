@@ -1,0 +1,118 @@
+```python
+def HSS(points, k: int, reference_point=None, 
+        expansion_factor: float = 1.1,
+        convergence_tolerance: float = 1e-10,
+        max_iterations: int = 5,
+        initial_selection_method: str = "greedy_hv",
+        enable_association_update: bool = True) -> np.ndarray:
+    import numpy as np
+    import pygmo as pg
+    from scipy.spatial.distance import cdist
+
+    if reference_point is None:
+        ref = np.max(points, axis=0) * expansion_factor
+    else:
+        ref = np.array(reference_point).flatten()
+    
+    n, m = points.shape
+    
+    def HV_cal(selected):
+        hv = pg.hypervolume(selected)
+        return hv.compute(ref)
+    
+    def hypervolume_contribution(point, subset):
+        if subset.shape[0]==0:
+            return np.prod(ref - point)
+        combined = np.vstack([subset, point])
+        hv_with = HV_cal(combined)
+        hv_without = HV_cal(subset)
+        return hv_with - hv_without
+    
+    def association_ini(data, dataSel):
+        dist = cdist(data, dataSel)
+        A = np.zeros((data.shape[0],2))
+        A[:,0] = np.min(dist, axis=1)
+        A[:,1] = np.argmin(dist, axis=1)
+        return A
+    
+    def association_upd(data, dataSel, i, newS, A):
+        indRel = np.where(A[:,1]==i)[0]
+        indOth = np.where(A[:,1]!=i)[0]
+        if len(indOth)>0:
+            distToNew = cdist(data[indOth,:], newS.reshape(1,-1)).flatten()
+            indChangeOth = indOth[distToNew < A[indOth,0]]
+            indRel = np.concatenate([indRel, indChangeOth])
+        dataSel_new = dataSel.copy()
+        dataSel_new[i,:] = newS
+        if len(indRel)>0:
+            distToAll = cdist(data[indRel,:], dataSel_new)
+            A[indRel,0] = np.min(distToAll, axis=1)
+            A[indRel,1] = np.argmin(distToAll, axis=1)
+        return A
+    
+    remaining = list(range(n))
+    selected = []
+    subset = np.zeros((0,m))
+    
+    # Initial selection
+    if initial_selection_method == "greedy_hv":
+        for _ in range(k):
+            best_idx=-1
+            best_contrib=-np.inf
+            for idx in remaining:
+                contrib = hypervolume_contribution(points[idx], subset)
+                if contrib>best_contrib:
+                    best_contrib=contrib
+                    best_idx=idx
+            if best_idx!=-1:
+                selected.append(best_idx)
+                subset = np.vstack([subset, points[best_idx]])
+                remaining.remove(best_idx)
+    else:
+        # Default to random initial selection
+        import random
+        selected = random.sample(remaining, k)
+        subset = points[selected]
+        remaining = [idx for idx in remaining if idx not in selected]
+    
+    improved=True
+    iter_count=0
+    while improved and iter_count<max_iterations:
+        improved=False
+        hv_before = HV_cal(subset)
+        A = association_ini(points, subset)
+        for i in range(k):
+            cand_indices = np.where(A[:,1]==i)[0]
+            cand_indices = [idx for idx in cand_indices if idx not in selected]
+            if not cand_indices:
+                continue
+            for cand_idx in cand_indices:
+                subset_temp = subset.copy()
+                subset_temp[i] = points[cand_idx]
+                hv_new = HV_cal(subset_temp)
+                if hv_new > hv_before + convergence_tolerance:
+                    subset[i]=points[cand_idx]
+                    old_idx=selected[i]
+                    selected[i]=cand_idx
+                    remaining.append(old_idx)
+                    remaining.remove(cand_idx)
+                    if enable_association_update:
+                        A = association_upd(points, subset, i, points[cand_idx], A)
+                    improved=True
+                    break
+            if improved:
+                break
+        iter_count+=1
+    
+    return subset
+```
+
+```python
+parameter_ranges = {
+    'expansion_factor': (1.01, 1.5),
+    'convergence_tolerance': (1e-12, 1e-6),
+    'max_iterations': (1, 20),
+    'initial_selection_method': ("greedy_hv", "random"),
+    'enable_association_update': (True, False)
+}
+```

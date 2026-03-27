@@ -1,0 +1,18 @@
+[
+    {
+        "algorithm": "{Progressive greedy selection combined with local hypervolume contribution pruning ensures efficient subset optimization.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    D = points.shape[1]\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    \n    points = np.copy(points)\n    subset = []\n    remaining = points.tolist()\n    \n    def hypervolume_contribution(point, current_set, ref):\n        if not current_set:\n            # Hypervolume of single point\n            return np.prod(ref - point)\n        # Approximate contribution by considering overlap with nearest point\n        distances = [np.max(ref - np.maximum(point, other)) for other in current_set]\n        min_dist = np.min(distances)\n        return np.prod(ref - point) - np.prod(ref - np.maximum(point, current_set[distances.index(min_dist)]))\n    \n    while len(subset) < k:\n        best_idx = 0\n        best_contrib = -np.inf\n        for i, p in enumerate(remaining):\n            contrib = hypervolume_contribution(p, subset, reference_point)\n            if contrib > best_contrib:\n                best_contrib = contrib\n                best_idx = i\n        subset.append(remaining[best_idx])\n        del remaining[best_idx]\n    \n    return np.array(subset)\n\n",
+        "score": [
+            5.118991897162229,
+            -0.10320148468017579
+        ]
+    },
+    {
+        "algorithm": "{Our algorithm uses a greedy selection process based on hypervolume contribution, repeatedly choosing the point that, when added to the current selected set, maximizes the increase in hypervolume relative to the reference point.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    selected_indices = []\n    selected_set = []\n    \n    def hypervolume_contribution(candidate_set, point):\n        temp_set = candidate_set + [point]\n        hv_with = compute_hypervolume(temp_set, reference_point)\n        hv_without = compute_hypervolume(candidate_set, reference_point)\n        return hv_with - hv_without\n    \n    def compute_hypervolume(points_list, ref):\n        if len(points_list) == 0:\n            return 0.0\n        points_array = np.array(points_list)\n        sorted_indices = np.argsort(points_array[:, 0])\n        sorted_points = points_array[sorted_indices]\n        volume = 0.0\n        prev_x = ref[0]\n        for p in sorted_points:\n            slice_width = prev_x - p[0]\n            slice_height = ref[1] - p[1]\n            volume += slice_width * slice_height\n            prev_x = p[0]\n        return volume\n    \n    for _ in range(k):\n        best_contrib = -np.inf\n        best_idx = -1\n        for idx, point in enumerate(points):\n            if idx in selected_indices:\n                continue\n            contrib = hypervolume_contribution(selected_set, point)\n            if contrib > best_contrib:\n                best_contrib = contrib\n                best_idx = idx\n        selected_indices.append(best_idx)\n        selected_set.append(points[best_idx])\n    \n    return np.array(selected_set)\n\n",
+        "score": [
+            4.616582288062783,
+            -0.025959491729736328
+        ]
+    }
+]

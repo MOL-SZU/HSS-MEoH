@@ -1,0 +1,170 @@
+import random
+import numpy as np
+from typing import List, Set, Any, Dict, Callable
+import pygmo as pg
+from mat2array import load_mat_to_numpy
+import time
+
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    # 获取点集的大小和维度
+    n, m = points.shape
+
+    if k <= 0 or k > n:
+        raise ValueError("k must be greater than 0 and not larger than the number of points.")
+
+    # 创建索引列表
+    R_indices = list(range(n))
+    R_objectives_array = points
+    random.shuffle(R_indices)
+
+    # 1. GSI算法 - 初始化
+    S = set(R_indices[:k])
+    elements_to_insert = R_indices[k:]
+
+    # 2. GSI算法 - 迭代过程
+    for element_to_add in elements_to_insert:
+        S.add(element_to_add)
+
+        worst_element_index = None
+        min_contribution = float('inf')
+
+        # 获取当前 S 的超体积
+        if not S:
+            M = R_objectives_array.shape[1] if R_objectives_array.ndim == 2 else 0
+            current_selected = np.empty((0, M))
+        else:
+            current_selected = R_objectives_array[list(S)]
+
+        if current_selected.size == 0:
+            current_hv = 0.0
+        else:
+            try:
+                hv = pg.hypervolume(current_selected)
+                current_hv = hv.compute(reference_point)
+            except Exception as e:
+                print(f"Hypervolume calculation error: {e}")
+                current_hv = 0.0
+
+        for s_index in list(S):
+            # 尝试移除 s_index: S_temp = S - {s_index}
+            S_temp = S - {s_index}
+
+            # 移除后的超体积
+            if not S_temp:
+                M = R_objectives_array.shape[1] if R_objectives_array.ndim == 2 else 0
+                temp_selected = np.empty((0, M))
+            else:
+                temp_selected = R_objectives_array[list(S_temp)]
+
+            if temp_selected.size == 0:
+                hv_after_remove = 0.0
+            else:
+                try:
+                    hv = pg.hypervolume(temp_selected)
+                    hv_after_remove = hv.compute(reference_point)
+                except Exception as e:
+                    print(f"Hypervolume calculation error: {e}")
+                    hv_after_remove = 0.0
+
+            # 贡献度 = 移除前的 HV - 移除后的 HV
+            contribution = current_hv - hv_after_remove
+
+            if contribution < min_contribution:
+                min_contribution = contribution
+                worst_element_index = s_index
+
+        if worst_element_index is not None:
+            S.remove(worst_element_index)
+
+    # 3. LS算法 - 初始化
+    current_S = set(S)
+    R_set = set(R_indices)
+
+    if len(current_S) != k:
+        raise ValueError("初始子集 S 的大小必须等于 k。")
+
+    # 4. LS算法 - 迭代过程
+    while True:
+        # 获取当前 S 的超体积
+        if not current_S:
+            M = R_objectives_array.shape[1] if R_objectives_array.ndim == 2 else 0
+            current_selected = np.empty((0, M))
+        else:
+            current_selected = R_objectives_array[list(current_S)]
+
+        if current_selected.size == 0:
+            current_hv = 0.0
+        else:
+            try:
+                hv = pg.hypervolume(current_selected)
+                current_hv = hv.compute(reference_point)
+            except Exception as e:
+                print(f"Hypervolume calculation error: {e}")
+                current_hv = 0.0
+
+        found_improvement = False
+
+        R_minus_S = list(R_set - current_S)
+        S_list = list(current_S)
+
+        # 遍历所有可能的交换对 (s, r)
+        for s_index in S_list:
+            for r_index in R_minus_S:
+                # 尝试交换: S' = S - {s_index} + {r_index}
+                S_new = (current_S - {s_index}) | {r_index}
+
+                # 计算新集合 S_new 的超体积
+                if not S_new:
+                    M = R_objectives_array.shape[1] if R_objectives_array.ndim == 2 else 0
+                    new_selected = np.empty((0, M))
+                else:
+                    new_selected = R_objectives_array[list(S_new)]
+
+                if new_selected.size == 0:
+                    new_hv = 0.0
+                else:
+                    try:
+                        hv = pg.hypervolume(new_selected)
+                        new_hv = hv.compute(reference_point)
+                    except Exception as e:
+                        print(f"Hypervolume calculation error: {e}")
+                        new_hv = 0.0
+
+                # 检查是否是改进
+                if new_hv > current_hv:
+                    current_S = S_new
+                    found_improvement = True
+                    break  # 跳出 r_index 循环
+
+            if found_improvement:
+                break  # 跳出 s_index 循环
+
+        if not found_improvement:
+            break
+
+    # 5. 返回选择的点
+    if not current_S:
+        M = R_objectives_array.shape[1] if R_objectives_array.ndim == 2 else 0
+        selected_points = np.empty((0, M))
+    else:
+        selected_points = R_objectives_array[list(current_S)]
+
+    return selected_points
+
+def HV_cal(selected_objectives, reference_point):
+    import pygmo as pg
+    hv = pg.hypervolume(selected_objectives)
+    return hv.compute(reference_point)
+
+if __name__ == "__main__":
+    row_data = load_mat_to_numpy('../data/my_data.mat', 'points')[:200, :]
+    reference_point = np.max(row_data, axis=0) * 1.1
+
+    reference_point = np.array([1.1, 1.1, 1.1])
+    start = time.time()
+    subset1 = HSS(row_data, 8, reference_point)
+    t = time.time() - start
+
+    score = HV_cal(subset1, reference_point)
+    print(f"GSI_LS time: {t} 秒")
+    print(f"GSI_LS HV: {score}")

@@ -1,0 +1,79 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    import numpy as np
+    import pygmo as pg
+    import heapq
+    
+    n, d = points.shape
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    # 快速计算单个点贡献
+    def point_contribution(point):
+        return np.prod(reference_point - point)
+    
+    # 初始化贡献队列
+    contributions = []
+    for idx in range(n):
+        contrib = point_contribution(points[idx])
+        heapq.heappush(contributions, (-contrib, idx))
+    
+    selected = []
+    selected_points_list = []
+    
+    # 贪心选择
+    while len(selected) < k and contributions:
+        neg_contrib, idx = heapq.heappop(contributions)
+        point = points[idx]
+        
+        # 如果已选点为空，直接添加
+        if not selected:
+            selected.append(idx)
+            selected_points_list.append(point)
+            continue
+        
+        # 计算实际贡献
+        selected_array = np.array(selected_points_list)
+        hv_before = pg.hypervolume(selected_array).compute(reference_point)
+        
+        temp_points = np.vstack([selected_array, point])
+        hv_after = pg.hypervolume(temp_points).compute(reference_point)
+        actual_contrib = hv_after - hv_before
+        
+        # 如果贡献很小，提前终止
+        if actual_contrib < 1e-12:
+            continue
+            
+        # 检查是否应该选择
+        if actual_contrib >= -neg_contrib * 0.999:  # 允许微小误差
+            selected.append(idx)
+            selected_points_list.append(point)
+        else:
+            # 重新插入更新后的贡献
+            heapq.heappush(contributions, (-actual_contrib, idx))
+    
+    # 如果未选够，从剩余点中选贡献最大的
+    if len(selected) < k:
+        remaining = [i for i in range(n) if i not in selected]
+        # 按初始贡献排序
+        remaining_contribs = [(point_contribution(points[i]), i) for i in remaining]
+        remaining_contribs.sort(reverse=True)
+        additional = min(k - len(selected), len(remaining_contribs))
+        for _, idx in remaining_contribs[:additional]:
+            selected.append(idx)
+    
+    return points[selected]
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

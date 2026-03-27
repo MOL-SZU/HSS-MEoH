@@ -1,0 +1,136 @@
+```python
+def HSS(points, k: int, reference_point, 
+        T_init: float = 2.0,
+        T_min: float = 1e-7,
+        alpha: float = 0.92,
+        max_iter: int = 1500,
+        swap_prob: float = 0.6):
+    n, m = points.shape
+    
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    # 初始化：贪心选择前k个点
+    selected_indices = set()
+    for _ in range(k):
+        best_idx = -1
+        best_hv = -np.inf
+        for i in range(n):
+            if i not in selected_indices:
+                temp_indices = selected_indices.copy()
+                temp_indices.add(i)
+                selected_points = points[list(temp_indices)]
+                hv = pg.hypervolume(selected_points)
+                test_hv = hv.compute(reference_point)
+                if test_hv > best_hv:
+                    best_hv = test_hv
+                    best_idx = i
+        if best_idx != -1:
+            selected_indices.add(best_idx)
+    
+    def compute_hv(indices):
+        if not indices:
+            return 0.0
+        selected_points = points[list(indices)]
+        hv = pg.hypervolume(selected_points)
+        return hv.compute(reference_point)
+    
+    current_hv = compute_hv(selected_indices)
+    
+    # 模拟退火参数（调整）
+    T = T_init
+    iteration = 0
+    
+    while T > T_min and iteration < max_iter:
+        # 动态调整操作概率
+        current_swap_prob = swap_prob if iteration < max_iter//2 else 0.8
+        
+        if random.random() < current_swap_prob:
+            if len(selected_indices) < n:
+                selected_list = list(selected_indices)
+                unselected = [i for i in range(n) if i not in selected_indices]
+                
+                if selected_list and unselected:
+                    s = random.choice(selected_list)
+                    r = random.choice(unselected)
+                    
+                    new_indices = selected_indices.copy()
+                    new_indices.remove(s)
+                    new_indices.add(r)
+                    
+                    new_hv = compute_hv(new_indices)
+                    
+                    delta = new_hv - current_hv
+                    if delta > 0 or random.random() < np.exp(delta / T):
+                        selected_indices = new_indices
+                        current_hv = new_hv
+        
+        else:
+            if selected_indices:
+                s = random.choice(list(selected_indices))
+                temp_indices = selected_indices.copy()
+                temp_indices.remove(s)
+                
+                unselected = [i for i in range(n) if i not in temp_indices]
+                best_idx = -1
+                best_hv = -np.inf
+                
+                for r in unselected:
+                    test_indices = temp_indices.copy()
+                    test_indices.add(r)
+                    test_hv = compute_hv(test_indices)
+                    
+                    if test_hv > best_hv:
+                        best_hv = test_hv
+                        best_idx = r
+                
+                if best_idx != -1:
+                    temp_indices.add(best_idx)
+                    new_hv = best_hv
+                    
+                    delta = new_hv - current_hv
+                    if delta > 0 or random.random() < np.exp(delta / T):
+                        selected_indices = temp_indices
+                        current_hv = new_hv
+        
+        # 非线性降温
+        T = T_init * np.exp(-alpha * iteration / 100)
+        iteration += 1
+    
+    # 增强局部搜索：多轮单点交换
+    for _ in range(3):
+        improved = True
+        while improved:
+            improved = False
+            selected_list = list(selected_indices)
+            unselected = [i for i in range(n) if i not in selected_indices]
+            
+            for s in selected_list:
+                for r in unselected:
+                    new_indices = selected_indices.copy()
+                    new_indices.remove(s)
+                    new_indices.add(r)
+                    
+                    new_hv = compute_hv(new_indices)
+                    
+                    if new_hv > current_hv:
+                        selected_indices = new_indices
+                        current_hv = new_hv
+                        improved = True
+                        break
+                
+                if improved:
+                    break
+    
+    return points[list(selected_indices)]
+```
+
+```python
+parameter_ranges = {
+    'T_init': (0.1, 10.0),
+    'T_min': (1e-10, 1e-3),
+    'alpha': (0.85, 0.99),
+    'max_iter': (500, 3000),
+    'swap_prob': (0.3, 0.9)
+}
+```

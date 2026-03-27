@@ -1,0 +1,107 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    import numpy as np
+    import pygmo as pg
+    from scipy.spatial.distance import cdist
+
+    if reference_point is None:
+        ref = np.max(points, axis=0) * 1.1
+    else:
+        ref = np.array(reference_point).flatten()
+    
+    n, m = points.shape
+    
+    def HV_cal(selected):
+        hv = pg.hypervolume(selected)
+        return hv.compute(ref)
+    
+    def hypervolume_contribution(point, subset):
+        if subset.shape[0]==0:
+            return np.prod(ref - point)
+        combined = np.vstack([subset, point])
+        hv_with = HV_cal(combined)
+        hv_without = HV_cal(subset)
+        return hv_with - hv_without
+    
+    def association_ini(data, dataSel):
+        dist = cdist(data, dataSel)
+        A = np.zeros((data.shape[0],2))
+        A[:,0] = np.min(dist, axis=1)
+        A[:,1] = np.argmin(dist, axis=1)
+        return A
+    
+    def association_upd(data, dataSel, i, newS, A):
+        indRel = np.where(A[:,1]==i)[0]
+        indOth = np.where(A[:,1]!=i)[0]
+        if len(indOth)>0:
+            distToNew = cdist(data[indOth,:], newS.reshape(1,-1)).flatten()
+            indChangeOth = indOth[distToNew < A[indOth,0]]
+            indRel = np.concatenate([indRel, indChangeOth])
+        dataSel_new = dataSel.copy()
+        dataSel_new[i,:] = newS
+        if len(indRel)>0:
+            distToAll = cdist(data[indRel,:], dataSel_new)
+            A[indRel,0] = np.min(distToAll, axis=1)
+            A[indRel,1] = np.argmin(distToAll, axis=1)
+        return A
+    
+    remaining = list(range(n))
+    selected = []
+    subset = np.zeros((0,m))
+    
+    for _ in range(k):
+        best_idx=-1
+        best_contrib=-np.inf
+        for idx in remaining:
+            contrib = hypervolume_contribution(points[idx], subset)
+            if contrib>best_contrib:
+                best_contrib=contrib
+                best_idx=idx
+        if best_idx!=-1:
+            selected.append(best_idx)
+            subset = np.vstack([subset, points[best_idx]])
+            remaining.remove(best_idx)
+    
+    improved=True
+    iter_count=0
+    while improved and iter_count<5:
+        improved=False
+        hv_before = HV_cal(subset)
+        A = association_ini(points, subset)
+        for i in range(k):
+            cand_indices = np.where(A[:,1]==i)[0]
+            cand_indices = [idx for idx in cand_indices if idx not in selected]
+            if not cand_indices:
+                continue
+            for cand_idx in cand_indices:
+                subset_temp = subset.copy()
+                subset_temp[i] = points[cand_idx]
+                hv_new = HV_cal(subset_temp)
+                if hv_new > hv_before + 1e-10:
+                    subset[i]=points[cand_idx]
+                    old_idx=selected[i]
+                    selected[i]=cand_idx
+                    remaining.append(old_idx)
+                    remaining.remove(cand_idx)
+                    A = association_upd(points, subset, i, points[cand_idx], A)
+                    improved=True
+                    break
+            if improved:
+                break
+        iter_count+=1
+    
+    return subset
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

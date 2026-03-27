@@ -1,0 +1,13 @@
+{
+    "generation": 10,
+    "analysis": "The top-performing heuristics share a common structure: they aggressively prune dominated points, reuse shared Monte Carlo samples, employ vectorized and chunked operations to update marginal contributions incrementally, and perform local-swap refinements with exact HV evaluations. In contrast, weaker variants tend to recompute hypervolumes repeatedly or use non-incremental strategies, incurring higher overhead with less effective candidate filtering.",
+    "experience": "Focus on data reuse and vectorized updates. Use shared samples and lazy evaluations for marginal gains while combining aggressive candidate pruning with local refinements to improve both accuracy and runtime.",
+    "current_reflection": "Focus on data reuse and vectorized updates. Use shared samples and lazy evaluations for marginal gains while combining aggressive candidate pruning with local refinements to improve both accuracy and runtime.",
+    "good_reflections": [],
+    "bad_reflections": [
+        "Focus on efficient pre\u2010processing (like skyline pruning) and reuse MC samples with vectorized, incremental updates. Limit expensive exact hypervolume calls by confining local swaps to small candidate shortlists, thus balancing quality and speed.",
+        "Focus on aggressive pre-pruning and reuse shared samples with vectorized, chunked computations. Incorporate a two-stage approach: fast greedy selection with approximate estimates followed by a brief, exact local refinement on a shortlist to improve quality without incurring excessive overhead.",
+        "Focus on candidate pruning, reuse of sampled data, and vectorized incremental updates. Minimize repeated expensive hypervolume calls by using approximate evaluations and limited local refinements on shortlisted candidates."
+    ],
+    "comprehensive_reflection": "\u2022 Keywords: Data reuse, vectorized updates, shared samples, candidate pruning, and local refinements.  \n\u2022 Advice: Prioritize vectorized incremental updates and integrate aggressive candidate pruning with targeted local refinements.  \n\u2022 Avoid: Repeated expensive evaluations and exact computations on broad candidate sets.  \n\u2022 Explanation: Reusing data through shared samples and lazy evaluations lets you efficiently prune and refine candidate solutions for improved accuracy and reduced runtime without incurring heavyweight computational costs."
+}

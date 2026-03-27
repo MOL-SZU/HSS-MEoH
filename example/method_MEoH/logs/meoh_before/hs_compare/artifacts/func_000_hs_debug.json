@@ -1,0 +1,106 @@
+{
+  "status": "no_valid_candidate",
+  "original_score": [
+    5.648963065857037,
+    -0.004684305191040039
+  ],
+  "parameter_ranges": {
+    "initial_temp": [
+      1.0,
+      500.0
+    ],
+    "final_temp": [
+      0.01,
+      1.0
+    ],
+    "cooling_rate": [
+      0.8,
+      0.99
+    ],
+    "max_iterations": [
+      100.0,
+      5000.0
+    ],
+    "k": [
+      3.0,
+      50.0
+    ]
+  },
+  "candidate_logs": [
+    {
+      "status": "score_invalid",
+      "harmony": [
+        499.10168365717334,
+        0.37747711918831944,
+        0.9854678711745772,
+        4849.17687714167,
+        32.0
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, initial_temp=499.10168365717334, final_temp=0.37747711918831944, cooling_rate=0.9854678711745772, max_iterations=4849.17687714167) -> np.ndarray:\n    import pygmo as pg\n    import random\n    n, m = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected_points = points[list(indices)]\n        hv = pg.hypervolume(selected_points)\n        return hv.compute(reference_point)\n    current_indices = set(random.sample(range(n), k))\n    current_hv = compute_hv(current_indices)\n    temperature = initial_temp\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    for iteration in range(max_iterations):\n        new_indices = current_indices.copy()\n        remove_idx = random.choice(list(new_indices))\n        new_indices.remove(remove_idx)\n        available = [i for i in range(n) if i not in new_indices]\n        if not available:\n            continue\n        add_idx = random.choice(available)\n        new_indices.add(add_idx)\n        new_hv = compute_hv(new_indices)\n        delta = new_hv - current_hv\n        if delta > 0:\n            current_indices = new_indices\n            current_hv = new_hv\n            if new_hv > best_hv:\n                best_indices = new_indices.copy()\n                best_hv = new_hv\n        elif random.random() < np.exp(delta / temperature):\n            current_indices = new_indices\n            current_hv = new_hv\n        temperature *= cooling_rate\n        if temperature < final_temp:\n            break\n    result_indices = list(best_indices)\n    return points[result_indices]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        415.33953379791535,
+        0.17749630379371173,
+        0.9614296741961484,
+        320.96112191581375,
+        50.0
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, initial_temp=415.33953379791535, final_temp=0.17749630379371173, cooling_rate=0.9614296741961484, max_iterations=320.96112191581375) -> np.ndarray:\n    import pygmo as pg\n    import random\n    n, m = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected_points = points[list(indices)]\n        hv = pg.hypervolume(selected_points)\n        return hv.compute(reference_point)\n    current_indices = set(random.sample(range(n), k))\n    current_hv = compute_hv(current_indices)\n    temperature = initial_temp\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    for iteration in range(max_iterations):\n        new_indices = current_indices.copy()\n        remove_idx = random.choice(list(new_indices))\n        new_indices.remove(remove_idx)\n        available = [i for i in range(n) if i not in new_indices]\n        if not available:\n            continue\n        add_idx = random.choice(available)\n        new_indices.add(add_idx)\n        new_hv = compute_hv(new_indices)\n        delta = new_hv - current_hv\n        if delta > 0:\n            current_indices = new_indices\n            current_hv = new_hv\n            if new_hv > best_hv:\n                best_indices = new_indices.copy()\n                best_hv = new_hv\n        elif random.random() < np.exp(delta / temperature):\n            current_indices = new_indices\n            current_hv = new_hv\n        temperature *= cooling_rate\n        if temperature < final_temp:\n            break\n    result_indices = list(best_indices)\n    return points[result_indices]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        103.75906552888664,
+        0.16658008555276252,
+        0.9050447705166169,
+        2358.9206077069066,
+        5.0
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, initial_temp=103.75906552888664, final_temp=0.16658008555276252, cooling_rate=0.9050447705166169, max_iterations=2358.9206077069066) -> np.ndarray:\n    import pygmo as pg\n    import random\n    n, m = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected_points = points[list(indices)]\n        hv = pg.hypervolume(selected_points)\n        return hv.compute(reference_point)\n    current_indices = set(random.sample(range(n), k))\n    current_hv = compute_hv(current_indices)\n    temperature = initial_temp\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    for iteration in range(max_iterations):\n        new_indices = current_indices.copy()\n        remove_idx = random.choice(list(new_indices))\n        new_indices.remove(remove_idx)\n        available = [i for i in range(n) if i not in new_indices]\n        if not available:\n            continue\n        add_idx = random.choice(available)\n        new_indices.add(add_idx)\n        new_hv = compute_hv(new_indices)\n        delta = new_hv - current_hv\n        if delta > 0:\n            current_indices = new_indices\n            current_hv = new_hv\n            if new_hv > best_hv:\n                best_indices = new_indices.copy()\n                best_hv = new_hv\n        elif random.random() < np.exp(delta / temperature):\n            current_indices = new_indices\n            current_hv = new_hv\n        temperature *= cooling_rate\n        if temperature < final_temp:\n            break\n    result_indices = list(best_indices)\n    return points[result_indices]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        30.125674412803004,
+        0.5161221281875515,
+        0.8692765962288124,
+        1774.1327975599183,
+        47.0
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, initial_temp=30.125674412803004, final_temp=0.5161221281875515, cooling_rate=0.8692765962288124, max_iterations=1774.1327975599183) -> np.ndarray:\n    import pygmo as pg\n    import random\n    n, m = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected_points = points[list(indices)]\n        hv = pg.hypervolume(selected_points)\n        return hv.compute(reference_point)\n    current_indices = set(random.sample(range(n), k))\n    current_hv = compute_hv(current_indices)\n    temperature = initial_temp\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    for iteration in range(max_iterations):\n        new_indices = current_indices.copy()\n        remove_idx = random.choice(list(new_indices))\n        new_indices.remove(remove_idx)\n        available = [i for i in range(n) if i not in new_indices]\n        if not available:\n            continue\n        add_idx = random.choice(available)\n        new_indices.add(add_idx)\n        new_hv = compute_hv(new_indices)\n        delta = new_hv - current_hv\n        if delta > 0:\n            current_indices = new_indices\n            current_hv = new_hv\n            if new_hv > best_hv:\n                best_indices = new_indices.copy()\n                best_hv = new_hv\n        elif random.random() < np.exp(delta / temperature):\n            current_indices = new_indices\n            current_hv = new_hv\n        temperature *= cooling_rate\n        if temperature < final_temp:\n            break\n    result_indices = list(best_indices)\n    return points[result_indices]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        275.729201398143,
+        0.7868150852054006,
+        0.8812743680143991,
+        3856.621536368559,
+        5.0
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, initial_temp=275.729201398143, final_temp=0.7868150852054006, cooling_rate=0.8812743680143991, max_iterations=3856.621536368559) -> np.ndarray:\n    import pygmo as pg\n    import random\n    n, m = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected_points = points[list(indices)]\n        hv = pg.hypervolume(selected_points)\n        return hv.compute(reference_point)\n    current_indices = set(random.sample(range(n), k))\n    current_hv = compute_hv(current_indices)\n    temperature = initial_temp\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    for iteration in range(max_iterations):\n        new_indices = current_indices.copy()\n        remove_idx = random.choice(list(new_indices))\n        new_indices.remove(remove_idx)\n        available = [i for i in range(n) if i not in new_indices]\n        if not available:\n            continue\n        add_idx = random.choice(available)\n        new_indices.add(add_idx)\n        new_hv = compute_hv(new_indices)\n        delta = new_hv - current_hv\n        if delta > 0:\n            current_indices = new_indices\n            current_hv = new_hv\n            if new_hv > best_hv:\n                best_indices = new_indices.copy()\n                best_hv = new_hv\n        elif random.random() < np.exp(delta / temperature):\n            current_indices = new_indices\n            current_hv = new_hv\n        temperature *= cooling_rate\n        if temperature < final_temp:\n            break\n    result_indices = list(best_indices)\n    return points[result_indices]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    }
+  ]
+}

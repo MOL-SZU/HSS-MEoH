@@ -1,0 +1,108 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    n, m = points.shape
+    
+    if reference_point is None:
+        ref = np.max(points, axis=0) * 1.1
+    else:
+        ref = np.array(reference_point).flatten()
+    
+    # 辅助函数：计算超体积
+    def compute_hv(subset):
+        if len(subset) == 0:
+            return 0.0
+        hv = pg.hypervolume(subset)
+        return hv.compute(ref)
+    
+    # 1. 贪心初始化：选择超体积贡献最大的 k 个点
+    selected_indices = []
+    current_subset = np.zeros((0, m))
+    
+    for _ in range(k):
+        best_contrib = -np.inf
+        best_idx = -1
+        
+        for idx in range(n):
+            if idx in selected_indices:
+                continue
+                
+            # 计算当前点的贡献
+            if len(current_subset) == 0:
+                contrib = np.prod(ref - points[idx])
+            else:
+                temp_subset = np.vstack([current_subset, points[idx].reshape(1, -1)])
+                hv_with = compute_hv(temp_subset)
+                hv_without = compute_hv(current_subset)
+                contrib = hv_with - hv_without
+            
+            if contrib > best_contrib:
+                best_contrib = contrib
+                best_idx = idx
+        
+        if best_idx != -1:
+            selected_indices.append(best_idx)
+            current_subset = np.vstack([current_subset, points[best_idx].reshape(1, -1)])
+    
+    # 2. 快速局部搜索：只尝试有潜力的交换
+    current_hv = compute_hv(current_subset)
+    improved = True
+    max_iter = 5  # 限制迭代次数以加快速度
+    
+    for _ in range(max_iter):
+        if not improved:
+            break
+            
+        improved = False
+        
+        # 对每个选中的点，只尝试与少数候选点交换
+        for i in range(k):
+            # 找到与当前点最相似的未选中点（欧氏距离最近）
+            current_point = current_subset[i]
+            distances = np.linalg.norm(points - current_point, axis=1)
+            
+            # 排除已选中的点
+            for idx in selected_indices:
+                distances[idx] = np.inf
+            
+            # 只考虑最近的几个候选点
+            candidate_indices = np.argsort(distances)[:min(10, n-k)]
+            
+            for cand_idx in candidate_indices:
+                if cand_idx in selected_indices:
+                    continue
+                
+                # 创建临时子集
+                temp_subset = current_subset.copy()
+                temp_subset[i] = points[cand_idx]
+                
+                # 计算新超体积
+                new_hv = compute_hv(temp_subset)
+                
+                # 如果改进，则接受交换
+                if new_hv > current_hv + 1e-10:
+                    # 更新子集和索引
+                    current_subset[i] = points[cand_idx]
+                    old_idx = selected_indices[i]
+                    selected_indices[i] = cand_idx
+                    current_hv = new_hv
+                    improved = True
+                    break  # 一旦找到改进就尝试下一个选中的点
+            
+            if improved:
+                break  # 重新开始扫描
+    
+    return current_subset
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

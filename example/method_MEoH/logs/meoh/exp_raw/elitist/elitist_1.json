@@ -1,0 +1,18 @@
+[
+    {
+        "algorithm": "{The algorithm uses a greedy selection strategy that iteratively picks the point with the largest hypervolume contribution to the current subset, efficiently computed using incremental hypervolume updates with a sliding reference point adjustment.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    D = points.shape[1]\n    if D == 1:\n        sorted_idx = np.argsort(-points.flatten())\n        return points[sorted_idx[:k]]\n    \n    selected_indices = []\n    remaining_indices = list(range(points.shape[0]))\n    current_ref = reference_point.copy()\n    \n    for _ in range(k):\n        if len(remaining_indices) == 0:\n            break\n        best_idx = -1\n        best_hv_contrib = -np.inf\n        \n        for idx in remaining_indices:\n            temp_ref = np.minimum(current_ref, points[idx])\n            contrib = 1.0\n            for sel in selected_indices:\n                hv_cell = 1.0\n                for d in range(D):\n                    hv_cell *= (temp_ref[d] - points[sel][d])\n                contrib -= hv_cell\n            if contrib > best_hv_contrib:\n                best_hv_contrib = contrib\n                best_idx = idx\n        \n        selected_indices.append(best_idx)\n        remaining_indices.remove(best_idx)\n        current_ref = np.minimum(current_ref, points[best_idx])\n    \n    return points[selected_indices]\n\n",
+        "score": [
+            4.393988826378808,
+            -0.009999608993530274
+        ]
+    },
+    {
+        "algorithm": "{Our algorithm efficiently identifies the k-point subset maximizing hypervolume by iteratively adding the point with the largest hypervolume improvement and strategically discarding the least contributor when exceeding k.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    D = points.shape[1]\n    subset = []\n    remaining = list(points)\n    \n    def hypervolume_improvement(p, current_set, ref):\n        if not current_set:\n            # volume of hyperbox from p to ref\n            return np.prod(ref - p)\n        # Compute contribution via inclusion\n        # Simplified: use worst-case bound; for better performance use exact HV calculation\n        temp_set = current_set + [p]\n        # Approximate: contribution is the exclusive volume not covered by others\n        # For efficiency, we approximate by min distance to ref\n        # More accurate would require HV calculation library\n        # Here we use a proxy: product of (ref - p) minus overlap with nearest neighbor\n        # Overlap approximation: for each dimension, find closest point in current_set\n        gains = ref - p\n        for q in current_set:\n            # Overlap reduces gain in dimensions where q is better than p\n            gains = np.minimum(gains, ref - q)\n        return np.prod(ref - p) - np.prod(gains)\n    \n    # Greedy addition\n    while len(subset) < k and remaining:\n        best_idx = 0\n        best_imp = -1\n        for i, p in enumerate(remaining):\n            imp = hypervolume_improvement(p, subset, reference_point)\n            if imp > best_imp:\n                best_imp = imp\n                best_idx = i\n        subset.append(remaining[best_idx])\n        del remaining[best_idx]\n    \n    # If points already selected but we have more than k? (case k < N)\n    # Actually k <= N, so subset size exactly k.\n    return np.array(subset)\n\n",
+        "score": [
+            5.053825133351006,
+            -0.019168567657470704
+        ]
+    }
+]

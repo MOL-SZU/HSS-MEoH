@@ -1,0 +1,85 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    import pygmo as pg
+    
+    n, m = points.shape
+    
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    def compute_hv(indices):
+        if len(indices) == 0:
+            return 0.0
+        selected_points = points[list(indices)]
+        hv = pg.hypervolume(selected_points)
+        return hv.compute(reference_point)
+    
+    # 初始解：随机选择k个点
+    current_indices = set(random.sample(range(n), k))
+    current_hv = compute_hv(current_indices)
+    
+    # 模拟退火参数
+    initial_temp = 100.0
+    final_temp = 0.1
+    cooling_rate = 0.95
+    max_iterations = 1000
+    
+    temperature = initial_temp
+    best_indices = current_indices.copy()
+    best_hv = current_hv
+    
+    for iteration in range(max_iterations):
+        # 生成邻域解：随机交换一个点
+        new_indices = current_indices.copy()
+        
+        # 随机选择一个要移除的点
+        remove_idx = random.choice(list(new_indices))
+        new_indices.remove(remove_idx)
+        
+        # 随机选择一个要添加的点（不在当前集合中）
+        available = [i for i in range(n) if i not in new_indices]
+        if not available:
+            continue
+        add_idx = random.choice(available)
+        new_indices.add(add_idx)
+        
+        # 计算新解的超体积
+        new_hv = compute_hv(new_indices)
+        
+        # 接受准则
+        delta = new_hv - current_hv
+        if delta > 0:
+            # 接受更好的解
+            current_indices = new_indices
+            current_hv = new_hv
+            if new_hv > best_hv:
+                best_indices = new_indices.copy()
+                best_hv = new_hv
+        else:
+            # 以一定概率接受劣解
+            if random.random() < np.exp(delta / temperature):
+                current_indices = new_indices
+                current_hv = new_hv
+        
+        # 降温
+        temperature *= cooling_rate
+        if temperature < final_temp:
+            break
+    
+    # 返回选中的点
+    result_indices = list(best_indices)
+    return points[result_indices]
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

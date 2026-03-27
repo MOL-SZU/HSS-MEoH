@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "avg_hv": -Infinity,
+    "avg_time": Infinity,
+    "num_files": 0
+  },
+  "details": [
+    {
+      "file": "points_200_4_001_1.277_1.818_1.103_1.342.mat",
+      "error": "name 'random' is not defined"
+    },
+    {
+      "file": "points_200_4_002_1.068_1.152_1.299_0.578.mat",
+      "error": "name 'random' is not defined"
+    },
+    {
+      "file": "points_200_4_003_1.049_1.991_1.426_1.725.mat",
+      "error": "name 'random' is not defined"
+    },
+    {
+      "file": "points_200_4_004_1.262_1.664_1.255_0.588.mat",
+      "error": "name 'random' is not defined"
+    },
+    {
+      "file": "points_200_4_005_1.144_1.085_1.974_1.969.mat",
+      "error": "name 'random' is not defined"
+    }
+  ]
+}

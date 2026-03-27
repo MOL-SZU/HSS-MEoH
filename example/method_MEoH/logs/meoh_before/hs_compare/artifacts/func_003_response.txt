@@ -1,0 +1,91 @@
+```python
+def HSS(points, k: int, reference_point=None, max_iter=500, T_initial=1.0, T_final=1e-6, alpha=0.95, swap_prob=0.5) -> np.ndarray:
+    import numpy as np
+    import pygmo as pg
+    import random
+    import math
+    
+    n, d = points.shape
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    def compute_hv(indices):
+        if len(indices) == 0:
+            return 0.0
+        selected = points[list(indices)]
+        hv = pg.hypervolume(selected)
+        return hv.compute(reference_point)
+    
+    # Greedy initialization: select top k points by individual HV contribution
+    hv_empty = 0.0
+    contributions = []
+    for i in range(n):
+        hv_single = compute_hv({i})
+        contributions.append((hv_single - hv_empty, i))
+    
+    # Sort by contribution and take top k
+    contributions.sort(reverse=True)
+    current_indices = set([idx for _, idx in contributions[:k]])
+    current_hv = compute_hv(current_indices)
+    best_indices = current_indices.copy()
+    best_hv = current_hv
+    
+    # Simulated annealing refinement
+    T = T_initial
+    
+    for iteration in range(max_iter):
+        # Generate neighbor: swap one point
+        neighbor = current_indices.copy()
+        
+        if random.random() < swap_prob and len(neighbor) > 0:
+            # Remove a random point
+            to_remove = random.choice(list(neighbor))
+            neighbor.remove(to_remove)
+            # Add a random point from remaining
+            available = set(range(n)) - neighbor
+            if available:
+                neighbor.add(random.choice(list(available)))
+        else:
+            # Direct swap: replace one point with another
+            if len(neighbor) > 0:
+                to_remove = random.choice(list(neighbor))
+                neighbor.remove(to_remove)
+                available = set(range(n)) - neighbor
+                if available:
+                    neighbor.add(random.choice(list(available)))
+        
+        neighbor_hmusic 
+        delta = neighbor_hv - current_hv
+        
+        # Acceptance criterion
+        if delta > 0 or random.random() < math.exp(delta / T):
+            current_indices = neighbor
+            current_hv = neighbor_hv
+            
+            if current_hv > best_hv:
+                best_indices = current_indices.copy()
+                best_hv = current_hv
+        
+        T *= alpha
+        if T < T_final:
+            break
+    
+    # Ensure exactly k points
+    if len(best_indices) < k:
+        remaining = set(range(n)) - best_indices
+        best_indices.update(random.sample(list(remaining), k - len(best_indices)))
+    elif len(best_indices) > k:
+        best_indices = set(random.sample(list(best_indices), k))
+    
+    return points[list(best_indices)]
+```
+
+```python
+parameter_ranges = {
+    'max_iter': (200, 1000),
+    'T_initial': (0.5, 5.0),
+    'T_final': (1e-8, 1e-4),
+    'alpha': (0.85, 0.99),
+    'swap_prob': (0.3, 0.7)
+}
+```

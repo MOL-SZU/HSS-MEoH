@@ -1,0 +1,120 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    if reference_point is None:
+        ref = np.max(points, axis=0) * 1.1
+    else:
+        ref = np.array(reference_point).flatten()
+    
+    n, m = points.shape
+    
+    def HV_cal(selected_objectives, reference_point):
+        hv = pg.hypervolume(selected_objectives)
+        return hv.compute(reference_point)
+    
+    def hypervolume_contribution(point, subset, ref):
+        if len(subset) == 0:
+            return np.prod(ref - point)
+        combined = np.vstack([subset, point.reshape(1, -1)])
+        hv_with = HV_cal(combined, ref)
+        hv_without = HV_cal(subset, ref)
+        return hv_with - hv_without
+    
+    def association_ini(data, dataSel):
+        n = data.shape[0]
+        A = np.zeros((n, 2))
+        dist = cdist(data, dataSel)
+        A[:, 0] = np.min(dist, axis=1)
+        A[:, 1] = np.argmin(dist, axis=1)
+        return A
+    
+    def association_upd(data, dataSel, i, newS, A):
+        n = data.shape[0]
+        indRel = np.where(A[:, 1] == i)[0]
+        indOth = np.where(A[:, 1] != i)[0]
+        
+        if len(indOth) > 0:
+            distToNew = cdist(data[indOth, :], newS.reshape(1, -1)).flatten()
+            indChangeOth = indOth[distToNew < A[indOth, 0]]
+            indRel = np.concatenate([indRel, indChangeOth])
+        
+        dataSel_new = dataSel.copy()
+        dataSel_new[i, :] = newS
+        
+        if len(indRel) > 0:
+            distToAll = cdist(data[indRel, :], dataSel_new)
+            A[indRel, 0] = np.min(distToAll, axis=1)
+            A[indRel, 1] = np.argmin(distToAll, axis=1)
+        
+        return A
+    
+    remaining_indices = list(range(n))
+    selected_indices = []
+    current_subset = np.zeros((0, m))
+    
+    for _ in range(k):
+        best_contrib = -np.inf
+        best_idx = -1
+        
+        for idx in remaining_indices:
+            contrib = hypervolume_contribution(points[idx], current_subset, ref)
+            if contrib > best_contrib:
+                best_contrib = contrib
+                best_idx = idx
+        
+        if best_idx != -1:
+            selected_indices.append(best_idx)
+            current_subset = np.vstack([current_subset, points[best_idx].reshape(1, -1)])
+            remaining_indices.remove(best_idx)
+    
+    improved = True
+    iteration = 0
+    
+    while improved and iteration < 20:
+        improved = False
+        total_hv_before = HV_cal(current_subset, ref)
+        A = association_ini(points, current_subset)
+        
+        for i in range(k):
+            associated_indices = np.where(A[:, 1] == i)[0]
+            candidate_indices = [idx for idx in associated_indices 
+                               if idx not in selected_indices]
+            
+            if not candidate_indices:
+                continue
+            
+            for cand_idx in candidate_indices:
+                temp_subset = current_subset.copy()
+                temp_subset[i] = points[cand_idx]
+                new_hv = HV_cal(temp_subset, ref)
+                
+                if new_hv > total_hv_before + 1e-10:
+                    current_subset[i] = points[cand_idx]
+                    old_idx = selected_indices[i]
+                    selected_indices[i] = cand_idx
+                    remaining_indices.append(old_idx)
+                    remaining_indices.remove(cand_idx)
+                    
+                    A = association_upd(points, current_subset, i, points[cand_idx], A)
+                    improved = True
+                    break
+            
+            if improved:
+                break
+        
+        iteration += 1
+    
+    return current_subset
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

@@ -1,0 +1,57 @@
+[2026-03-22 15:39:51] profile.py(255) : ====================================================================
+[2026-03-22 15:39:51] profile.py(256) : LLM Parameters
+[2026-03-22 15:39:51] profile.py(257) : --------------------------------------------------------------------
+[2026-03-22 15:39:51] profile.py(258) :   - LLM: HttpsApi
+[2026-03-22 15:39:51] profile.py(261) :   - do_auto_trim: True
+[2026-03-22 15:39:51] profile.py(261) :   - debug_mode: False
+[2026-03-22 15:39:51] profile.py(261) :   - _host: www.dmxapi.cn
+[2026-03-22 15:39:51] profile.py(261) :   - _key: sk-Bf6yC0nmwmn5sBSN9QHlshTIqUEkGRsWvyi5s1Enlgt6qU55
+[2026-03-22 15:39:51] profile.py(261) :   - _model: DeepSeek-V3.2
+[2026-03-22 15:39:51] profile.py(261) :   - _timeout: 240
+[2026-03-22 15:39:51] profile.py(261) :   - _kwargs: {}
+[2026-03-22 15:39:51] profile.py(261) :   - _cumulative_error: 0
+[2026-03-22 15:39:51] profile.py(262) : ====================================================================
+[2026-03-22 15:39:51] profile.py(263) : Problem Parameters
+[2026-03-22 15:39:51] profile.py(264) : --------------------------------------------------------------------
+[2026-03-22 15:39:51] profile.py(265) :   - Problem: HSS_Evaluation
+[2026-03-22 15:39:51] profile.py(268) :   - task_description: 
+    Implement a function that selects a subset from a set of non-dominated points to maximize their hypervolume.
+    
+[2026-03-22 15:39:51] profile.py(268) :   - use_numba_accelerate: False
+[2026-03-22 15:39:51] profile.py(268) :   - use_protected_div: False
+[2026-03-22 15:39:51] profile.py(268) :   - protected_div_delta: 1e-05
+[2026-03-22 15:39:51] profile.py(268) :   - random_seed: None
+[2026-03-22 15:39:51] profile.py(268) :   - timeout_seconds: 60
+[2026-03-22 15:39:51] profile.py(268) :   - exec_code: True
+[2026-03-22 15:39:51] profile.py(268) :   - safe_evaluate: True
+[2026-03-22 15:39:51] profile.py(268) :   - daemon_eval_process: False
+[2026-03-22 15:39:51] profile.py(268) :   - fork_proc: auto
+[2026-03-22 15:39:51] profile.py(268) :   - k: 8
+[2026-03-22 15:39:51] profile.py(270) : ====================================================================
+[2026-03-22 15:39:51] profile.py(271) : Method Parameters
+[2026-03-22 15:39:51] profile.py(272) : --------------------------------------------------------------------
+[2026-03-22 15:39:51] profile.py(273) :   - Method: MEoH
+[2026-03-22 15:39:51] profile.py(277) :   - _num_objs: 2
+[2026-03-22 15:39:51] profile.py(277) :   - _max_generations: 150
+[2026-03-22 15:39:51] profile.py(277) :   - _max_sample_nums: 150
+[2026-03-22 15:39:51] profile.py(277) :   - _pop_size: 10
+[2026-03-22 15:39:51] profile.py(277) :   - _selection_num: 2
+[2026-03-22 15:39:51] profile.py(277) :   - _use_e2_operator: True
+[2026-03-22 15:39:51] profile.py(277) :   - _use_m1_operator: True
+[2026-03-22 15:39:51] profile.py(277) :   - _use_m2_operator: True
+[2026-03-22 15:39:51] profile.py(277) :   - _use_p1_operator: True
+[2026-03-22 15:39:51] profile.py(277) :   - _use_t1_operator: True
+[2026-03-22 15:39:51] profile.py(277) :   - _use_flash_reflection: False
+[2026-03-22 15:39:51] profile.py(277) :   - _use_harmony_search: False
+[2026-03-22 15:39:51] profile.py(277) :   - _num_samplers: 4
+[2026-03-22 15:39:51] profile.py(277) :   - _num_evaluators: 4
+[2026-03-22 15:39:51] profile.py(277) :   - _resume_mode: False
+[2026-03-22 15:39:51] profile.py(277) :   - _resume_direction: None
+[2026-03-22 15:39:51] profile.py(277) :   - _initial_sample_num: None
+[2026-03-22 15:39:51] profile.py(277) :   - _debug_mode: False
+[2026-03-22 15:39:51] profile.py(277) :   - _multi_thread_or_process_eval: thread
+[2026-03-22 15:39:51] profile.py(277) :   - _parent_selection_strategy: dominated
+[2026-03-22 15:39:51] profile.py(277) :   - _exploitation_alpha: 1.0
+[2026-03-22 15:39:51] profile.py(277) :   - _parent_selection_lambda: 10.0
+[2026-03-22 15:39:51] profile.py(277) :   - _function_to_evolve_name: HSS
+[2026-03-22 15:39:51] profile.py(279) : =====================================================================

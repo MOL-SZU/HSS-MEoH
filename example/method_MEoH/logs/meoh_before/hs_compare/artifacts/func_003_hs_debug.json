@@ -1,0 +1,106 @@
+{
+  "status": "no_valid_candidate",
+  "original_score": [
+    6.164968614313576,
+    -0.006678438186645508
+  ],
+  "parameter_ranges": {
+    "max_iter": [
+      200.0,
+      1000.0
+    ],
+    "T_initial": [
+      0.5,
+      5.0
+    ],
+    "T_final": [
+      1e-08,
+      0.0001
+    ],
+    "alpha": [
+      0.85,
+      0.99
+    ],
+    "swap_prob": [
+      0.3,
+      0.7
+    ]
+  },
+  "candidate_logs": [
+    {
+      "status": "score_invalid",
+      "harmony": [
+        543.2485671513977,
+        1.0441381197584927,
+        6.037484732701012e-05,
+        0.8782553186740725,
+        0.6582101301916656
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, max_iter=543.2485671513977, T_initial=1.0441381197584927, T_final=6.037484732701012e-05, alpha=0.8782553186740725, swap_prob=0.6582101301916656) -> np.ndarray:\n    import numpy as np\n    import pygmo as pg\n    import random\n    import math\n    n, d = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected = points[list(indices)]\n        hv = pg.hypervolume(selected)\n        return hv.compute(reference_point)\n    hv_empty = 0.0\n    contributions = []\n    for i in range(n):\n        hv_single = compute_hv({i})\n        contributions.append((hv_single - hv_empty, i))\n    contributions.sort(reverse=True)\n    current_indices = set([idx for _, idx in contributions[:k]])\n    current_hv = compute_hv(current_indices)\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    T = T_initial\n    for iteration in range(max_iter):\n        neighbor = current_indices.copy()\n        if random.random() < swap_prob and len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        elif len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        neighbor_hmusic\n        delta = neighbor_hv - current_hv\n        if delta > 0 or random.random() < math.exp(delta / T):\n            current_indices = neighbor\n            current_hv = neighbor_hv\n            if current_hv > best_hv:\n                best_indices = current_indices.copy()\n                best_hv = current_hv\n        T *= alpha\n        if T < T_final:\n            break\n    if len(best_indices) < k:\n        remaining = set(range(n)) - best_indices\n        best_indices.update(random.sample(list(remaining), k - len(best_indices)))\n    elif len(best_indices) > k:\n        best_indices = set(random.sample(list(best_indices), k))\n    return points[list(best_indices)]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        517.6188583650294,
+        1.1633386567064383,
+        4.010968713619965e-05,
+        0.890645890322184,
+        0.5010374866675023
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, max_iter=517.6188583650294, T_initial=1.1633386567064383, T_final=4.010968713619965e-05, alpha=0.890645890322184, swap_prob=0.5010374866675023) -> np.ndarray:\n    import numpy as np\n    import pygmo as pg\n    import random\n    import math\n    n, d = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected = points[list(indices)]\n        hv = pg.hypervolume(selected)\n        return hv.compute(reference_point)\n    hv_empty = 0.0\n    contributions = []\n    for i in range(n):\n        hv_single = compute_hv({i})\n        contributions.append((hv_single - hv_empty, i))\n    contributions.sort(reverse=True)\n    current_indices = set([idx for _, idx in contributions[:k]])\n    current_hv = compute_hv(current_indices)\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    T = T_initial\n    for iteration in range(max_iter):\n        neighbor = current_indices.copy()\n        if random.random() < swap_prob and len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        elif len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        neighbor_hmusic\n        delta = neighbor_hv - current_hv\n        if delta > 0 or random.random() < math.exp(delta / T):\n            current_indices = neighbor\n            current_hv = neighbor_hv\n            if current_hv > best_hv:\n                best_indices = current_indices.copy()\n                best_hv = current_hv\n        T *= alpha\n        if T < T_final:\n            break\n    if len(best_indices) < k:\n        remaining = set(range(n)) - best_indices\n        best_indices.update(random.sample(list(remaining), k - len(best_indices)))\n    elif len(best_indices) > k:\n        best_indices = set(random.sample(list(best_indices), k))\n    return points[list(best_indices)]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        969.159297677216,
+        3.647326343831192,
+        5.1485360063304794e-05,
+        0.8849545506601066,
+        0.5219104150354861
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, max_iter=969.159297677216, T_initial=3.647326343831192, T_final=5.1485360063304794e-05, alpha=0.8849545506601066, swap_prob=0.5219104150354861) -> np.ndarray:\n    import numpy as np\n    import pygmo as pg\n    import random\n    import math\n    n, d = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected = points[list(indices)]\n        hv = pg.hypervolume(selected)\n        return hv.compute(reference_point)\n    hv_empty = 0.0\n    contributions = []\n    for i in range(n):\n        hv_single = compute_hv({i})\n        contributions.append((hv_single - hv_empty, i))\n    contributions.sort(reverse=True)\n    current_indices = set([idx for _, idx in contributions[:k]])\n    current_hv = compute_hv(current_indices)\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    T = T_initial\n    for iteration in range(max_iter):\n        neighbor = current_indices.copy()\n        if random.random() < swap_prob and len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        elif len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        neighbor_hmusic\n        delta = neighbor_hv - current_hv\n        if delta > 0 or random.random() < math.exp(delta / T):\n            current_indices = neighbor\n            current_hv = neighbor_hv\n            if current_hv > best_hv:\n                best_indices = current_indices.copy()\n                best_hv = current_hv\n        T *= alpha\n        if T < T_final:\n            break\n    if len(best_indices) < k:\n        remaining = set(range(n)) - best_indices\n        best_indices.update(random.sample(list(remaining), k - len(best_indices)))\n    elif len(best_indices) > k:\n        best_indices = set(random.sample(list(best_indices), k))\n    return points[list(best_indices)]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        317.5493985366179,
+        2.3521549855974424,
+        5.33456389072279e-05,
+        0.9721833138945054,
+        0.43349635170330564
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, max_iter=317.5493985366179, T_initial=2.3521549855974424, T_final=5.33456389072279e-05, alpha=0.9721833138945054, swap_prob=0.43349635170330564) -> np.ndarray:\n    import numpy as np\n    import pygmo as pg\n    import random\n    import math\n    n, d = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected = points[list(indices)]\n        hv = pg.hypervolume(selected)\n        return hv.compute(reference_point)\n    hv_empty = 0.0\n    contributions = []\n    for i in range(n):\n        hv_single = compute_hv({i})\n        contributions.append((hv_single - hv_empty, i))\n    contributions.sort(reverse=True)\n    current_indices = set([idx for _, idx in contributions[:k]])\n    current_hv = compute_hv(current_indices)\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    T = T_initial\n    for iteration in range(max_iter):\n        neighbor = current_indices.copy()\n        if random.random() < swap_prob and len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        elif len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        neighbor_hmusic\n        delta = neighbor_hv - current_hv\n        if delta > 0 or random.random() < math.exp(delta / T):\n            current_indices = neighbor\n            current_hv = neighbor_hv\n            if current_hv > best_hv:\n                best_indices = current_indices.copy()\n                best_hv = current_hv\n        T *= alpha\n        if T < T_final:\n            break\n    if len(best_indices) < k:\n        remaining = set(range(n)) - best_indices\n        best_indices.update(random.sample(list(remaining), k - len(best_indices)))\n    elif len(best_indices) > k:\n        best_indices = set(random.sample(list(best_indices), k))\n    return points[list(best_indices)]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    },
+    {
+      "status": "score_invalid",
+      "harmony": [
+        611.6355312264593,
+        4.315857115865369,
+        5.578541658413425e-05,
+        0.9554184410154234,
+        0.37108595788216764
+      ],
+      "code": "def HSS(points, k: int, reference_point=None, max_iter=611.6355312264593, T_initial=4.315857115865369, T_final=5.578541658413425e-05, alpha=0.9554184410154234, swap_prob=0.37108595788216764) -> np.ndarray:\n    import numpy as np\n    import pygmo as pg\n    import random\n    import math\n    n, d = points.shape\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n\n    def compute_hv(indices):\n        if len(indices) == 0:\n            return 0.0\n        selected = points[list(indices)]\n        hv = pg.hypervolume(selected)\n        return hv.compute(reference_point)\n    hv_empty = 0.0\n    contributions = []\n    for i in range(n):\n        hv_single = compute_hv({i})\n        contributions.append((hv_single - hv_empty, i))\n    contributions.sort(reverse=True)\n    current_indices = set([idx for _, idx in contributions[:k]])\n    current_hv = compute_hv(current_indices)\n    best_indices = current_indices.copy()\n    best_hv = current_hv\n    T = T_initial\n    for iteration in range(max_iter):\n        neighbor = current_indices.copy()\n        if random.random() < swap_prob and len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        elif len(neighbor) > 0:\n            to_remove = random.choice(list(neighbor))\n            neighbor.remove(to_remove)\n            available = set(range(n)) - neighbor\n            if available:\n                neighbor.add(random.choice(list(available)))\n        neighbor_hmusic\n        delta = neighbor_hv - current_hv\n        if delta > 0 or random.random() < math.exp(delta / T):\n            current_indices = neighbor\n            current_hv = neighbor_hv\n            if current_hv > best_hv:\n                best_indices = current_indices.copy()\n                best_hv = current_hv\n        T *= alpha\n        if T < T_final:\n            break\n    if len(best_indices) < k:\n        remaining = set(range(n)) - best_indices\n        best_indices.update(random.sample(list(remaining), k - len(best_indices)))\n    elif len(best_indices) > k:\n        best_indices = set(random.sample(list(best_indices), k))\n    return points[list(best_indices)]",
+      "score": [
+        -Infinity,
+        -Infinity
+      ]
+    }
+  ]
+}

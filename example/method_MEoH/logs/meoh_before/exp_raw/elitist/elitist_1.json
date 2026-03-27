@@ -1,0 +1,18 @@
+[
+    {
+        "algorithm": "{The algorithm greedily selects points with the highest hypervolume contribution iteratively, updating contributions after each selection to account for dominated regions.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    ref = reference_point\n    remaining_indices = list(range(len(points)))\n    selected_indices = []\n    current_set = []\n    \n    def hypervolume_contribution(candidate_idx, current_front):\n        if not current_front:\n            return np.prod(ref - points[candidate_idx])\n        front = np.array(current_front + [points[candidate_idx]])\n        sorted_front = front[np.argsort(front[:, 0])]\n        hv = 0\n        prev_x = ref[0]\n        for p in sorted_front:\n            width = prev_x - p[0]\n            height = ref[1] - p[1]\n            hv += width * height\n            prev_x = p[0]\n        existing_hv = 0\n        if current_front:\n            sorted_existing = np.array(current_front)[np.argsort([p[0] for p in current_front])]\n            prev_x = ref[0]\n            for p in sorted_existing:\n                width = prev_x - p[0]\n                height = ref[1] - p[1]\n                existing_hv += width * height\n                prev_x = p[0]\n        return hv - existing_hv\n    \n    while len(selected_indices) < k and remaining_indices:\n        best_idx = None\n        best_contrib = -np.inf\n        for idx in remaining_indices:\n            contrib = hypervolume_contribution(idx, current_set)\n            if contrib > best_contrib:\n                best_contrib = contrib\n                best_idx = idx\n        if best_idx is not None:\n            selected_indices.append(best_idx)\n            current_set.append(points[best_idx])\n            remaining_indices.remove(best_idx)\n        else:\n            break\n    \n    return points[selected_indices]\n\n",
+        "score": [
+            5.025151022465149,
+            -0.02642521858215332
+        ]
+    },
+    {
+        "algorithm": "{The algorithm greedily selects points in descending order of their hypervolume contribution to the current subset, using an incremental hypervolume calculation with a sliding reference point to efficiently update contributions after each selection.}",
+        "function": "def HSS(points, k: int, reference_point) -> np.ndarray:\n    if reference_point is None:\n        reference_point = np.max(points, axis=0) * 1.1\n    ref = np.asarray(reference_point)\n    D = points.shape[1]\n    remaining_indices = list(range(len(points)))\n    selected_indices = []\n    contributions = np.zeros(len(points))\n    \n    for idx in remaining_indices:\n        contributions[idx] = np.prod(ref - points[idx])\n    \n    for _ in range(k):\n        best_idx = remaining_indices[np.argmax(contributions[remaining_indices])]\n        selected_indices.append(best_idx)\n        remaining_indices.remove(best_idx)\n        \n        if not remaining_indices:\n            break\n            \n        for idx in remaining_indices:\n            old_cont = contributions[idx]\n            new_cont = np.prod(ref - np.maximum(points[idx], points[best_idx]))\n            contributions[idx] = new_cont\n    \n    return points[selected_indices]\n\n",
+        "score": [
+            3.669400862121269,
+            -0.007055902481079101
+        ]
+    }
+]

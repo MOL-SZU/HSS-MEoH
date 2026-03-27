@@ -1,0 +1,129 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    n, m = points.shape
+    
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    # 初始化：随机选择 k 个点
+    selected_indices = set(np.random.choice(n, size=k, replace=False))
+    
+    # 计算当前超体积
+    def compute_hv(indices):
+        if not indices:
+            return 0.0
+        selected_points = points[list(indices)]
+        hv = pg.hypervolume(selected_points)
+        return hv.compute(reference_point)
+    
+    current_hv = compute_hv(selected_indices)
+    
+    # 模拟退火参数
+    T_init = 1.0
+    T_min = 1e-6
+    alpha = 0.95
+    max_iter = 1000
+    
+    T = T_init
+    iteration = 0
+    
+    while T > T_min and iteration < max_iter:
+        # 随机选择操作类型：交换或替换
+        if random.random() < 0.7:  # 70%概率进行交换
+            # 随机交换一个已选点和一个未选点
+            if len(selected_indices) < n:
+                selected_list = list(selected_indices)
+                unselected = [i for i in range(n) if i not in selected_indices]
+                
+                if selected_list and unselected:
+                    s = random.choice(selected_list)
+                    r = random.choice(unselected)
+                    
+                    new_indices = selected_indices.copy()
+                    new_indices.remove(s)
+                    new_indices.add(r)
+                    
+                    new_hv = compute_hv(new_indices)
+                    
+                    # 接受准则
+                    delta = new_hv - current_hv
+                    if delta > 0 or random.random() < np.exp(delta / T):
+                        selected_indices = new_indices
+                        current_hv = new_hv
+        
+        else:  # 30%概率进行替换
+            # 随机移除一个点，然后贪心添加最佳点
+            if selected_indices:
+                # 随机移除一个点
+                s = random.choice(list(selected_indices))
+                temp_indices = selected_indices.copy()
+                temp_indices.remove(s)
+                
+                # 贪心添加最佳未选点
+                unselected = [i for i in range(n) if i not in temp_indices]
+                best_idx = -1
+                best_hv = -np.inf
+                
+                for r in unselected:
+                    test_indices = temp_indices.copy()
+                    test_indices.add(r)
+                    test_hv = compute_hv(test_indices)
+                    
+                    if test_hv > best_hv:
+                        best_hv = test_hv
+                        best_idx = r
+                
+                if best_idx != -1:
+                    temp_indices.add(best_idx)
+                    new_hv = best_hv
+                    
+                    # 接受准则
+                    delta = new_hv - current_hv
+                    if delta > 0 or random.random() < np.exp(delta / T):
+                        selected_indices = temp_indices
+                        current_hv = new_hv
+        
+        # 降温
+        T *= alpha
+        iteration += 1
+    
+    # 最终局部搜索：尝试所有单点交换
+    improved = True
+    while improved:
+        improved = False
+        selected_list = list(selected_indices)
+        unselected = [i for i in range(n) if i not in selected_indices]
+        
+        for s in selected_list:
+            for r in unselected:
+                new_indices = selected_indices.copy()
+                new_indices.remove(s)
+                new_indices.add(r)
+                
+                new_hv = compute_hv(new_indices)
+                
+                if new_hv > current_hv:
+                    selected_indices = new_indices
+                    current_hv = new_hv
+                    improved = True
+                    break
+            
+            if improved:
+                break
+    
+    # 返回选中的点
+    return points[list(selected_indices)]
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.

@@ -1,0 +1,116 @@
+You are an expert in code review. Your task is to select only the 5 most important tunable hyperparameters from the function and convert them into default parameters.
+[code]
+def HSS(points, k: int, reference_point) -> np.ndarray:
+    """
+    HSS (Hypervolume-based Subset Selection): 贪心选择超体积贡献最大的 k 个点
+
+    参数:
+        points: np.ndarray
+            所有候选点，形状为 (N, D)，其中 N 是点数，D 是目标维度
+        k: int
+            需要选择的点数
+        reference_point: np.ndarray, optional
+            参考点，形状为 (D,)。如果为 None，则使用 points 的最大值 * 1.1
+
+    返回:
+        subset: np.ndarray
+            选出的子集，形状为 (k, D)
+    """
+    import numpy as np
+    import pygmo as pg
+    import random
+    
+    n, d = points.shape
+    if reference_point is None:
+        reference_point = np.max(points, axis=0) * 1.1
+    
+    def compute_hv(indices):
+        if len(indices) == 0:
+            return 0.0
+        return pg.hypervolume(points[indices]).compute(reference_point)
+    
+    # 初始化种群
+    population_size = 20
+    population = []
+    for _ in range(population_size):
+        indices = random.sample(range(n), k)
+        population.append((indices, compute_hv(indices)))
+    
+    # 进化参数
+    generations = 100
+    tournament_size = 3
+    mutation_rate = 0.7
+    
+    for gen in range(generations):
+        # 选择父代（锦标赛选择）
+        parents = []
+        for _ in range(population_size):
+            tournament = random.sample(population, tournament_size)
+            best = max(tournament, key=lambda x: x[1])
+            parents.append(best[0])
+        
+        # 生成子代
+        new_population = []
+        for parent_indices in parents:
+            child_indices = parent_indices.copy()
+            
+            # 变异操作
+            if random.random() < mutation_rate:
+                # 随机替换一个点
+                selected_idx = random.randint(0, k-1)
+                current_point = child_indices[selected_idx]
+                
+                # 选择替换点：优先选择距离当前点较远的点
+                distances = np.linalg.norm(points - points[current_point], axis=1)
+                for idx in child_indices:
+                    distances[idx] = -np.inf  # 排除已选点
+                
+                # 选择距离最远的几个候选点
+                far_candidates = np.argsort(-distances)[:min(10, n-k)]
+                if len(far_candidates) > 0:
+                    new_point = random.choice(far_candidates)
+                    child_indices[selected_idx] = new_point
+            
+            # 局部优化：尝试交换改进
+            for i in range(k):
+                current_hv = compute_hv(child_indices)
+                best_swap = child_indices[i]
+                
+                # 尝试与随机候选点交换
+                candidates = random.sample([idx for idx in range(n) if idx not in child_indices], 
+                                         min(5, n-k))
+                for cand in candidates:
+                    temp_indices = child_indices.copy()
+                    temp_indices[i] = cand
+                    new_hv = compute_hv(temp_indices)
+                    if new_hv > current_hv + 1e-10:
+                        best_swap = cand
+                        current_hv = new_hv
+                
+                child_indices[i] = best_swap
+            
+            new_population.append((child_indices, compute_hv(child_indices)))
+        
+        # 精英保留：保留上一代最优个体
+        population.sort(key=lambda x: x[1], reverse=True)
+        new_population.sort(key=lambda x: x[1], reverse=True)
+        new_population[-1] = population[0]  # 替换最差个体为上一代最优
+        
+        population = new_population
+    
+    # 返回最优解
+    best_indices, _ = max(population, key=lambda x: x[1])
+    return points[best_indices]
+
+
+
+Select only the 5 most important threshold, weight, or hardcoded variables that are most likely to affect performance. Convert only these 5 variables into default parameters and give me a 'parameter_ranges' dictionary representation. Key of dict is parameter name. Value of key is a tuple in Python that MUST include 2 float elements: the begin value and the end value for that parameter.
+
+Requirements:
+- Do not change the algorithm logic except turning the chosen 5 variables into tunable default parameters.
+- Do not output more than 5 parameters in 'parameter_ranges'.
+- Prefer parameters that strongly affect solution quality or runtime.
+- Keep integer-like control parameters reasonable if you choose them.
+
+- Output code only and enclose your code with Python code block: ```python ... ```.
+- Output 'parameter_ranges' dictionary only and enclose your code with other Python code block: ```python ... ```.
