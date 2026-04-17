@@ -1,6 +1,6 @@
 # 🚀 HSS-MEoH: Designing Hypervolume Subset Selection Algorithms with Large Language Models
 
-This repository contains the official implementation of **HSS-MEoH**, an LLM-based framework for automatically designing Hypervolume Subset Selection (HSS) algorithms.
+This repository contains the official implementation of **HSS-MEoH**, the first LLM-based framework for automatically designing Hypervolume Subset Selection (HSS) algorithms.
 
 📄 Paper: *Designing Hypervolume Subset Selection Algorithms with Large Language Models* 
 
@@ -27,31 +27,18 @@ We formulate algorithm design itself as a **multi-objective optimization problem
 - 🎯 Objective 1: Maximize solution quality (Hypervolume)
 - ⚡ Objective 2: Minimize runtime
 
-Instead of designing a single algorithm, HSS-MEoH discovers a **Pareto set of algorithms** with different trade-offs.
+Instead of designing a single algorithm, HSS-MEoH discovers a **well-distributed set of non-dominated HSS algorithms** with different performance and runtime trade-offs.
 
 ------
 
 ## ✨ Key Contributions
 
-- 🔥 First LLM-based framework for **HSS algorithm design**
+- 🔥 We propose the first LLM-based framework for automatic design of HSS algorithms by formulating the problem as a multi-objective optimization task over algorithm performance and runtime.
 
-- 🌱 
 
-  Diverse Warm-Start Initialization (DWS-Init)
+* ⚙️ We incorporate three mechanisms, namely **Diverse Warm-Start Initialization (DWS-Init)**, **Reflective Evolution Mechanism (REM)**, and **Novelty-Weighted Parent Selection (NWPS)**, into the proposed framework, which together improve the quality, diversity, and search efficiency of the discovered non-dominated HSS algorithms.
 
-  - Uses multiple classical HSS algorithms as seeds
-
-- 🔁 
-
-  Reflective Evolution Mechanism (REM)
-
-  - Enables LLM to learn from past generated heuristics
-
-- 🎲 
-
-  Novelty-Weighted Parent Selection (NWPS)
-
-  - Balances exploitation and exploration using novelty
+* 🧪 We conduct extensive experiments to show that the algorithms designed by **HSS-MEoH** consistently outperform those designed by **MEoH** and dominate most human-designed HSS algorithms in terms of performance and runtime trade-offs.
 
 ------
 
@@ -59,7 +46,7 @@ Instead of designing a single algorithm, HSS-MEoH discovers a **Pareto set of al
 
 The HSS-MEoH framework follows an evolutionary process:
 
-```
+```text
 Initialization → Selection → Reflection → Crossover → Mutation → Evaluation → Population Update
 ```
 
@@ -73,12 +60,19 @@ Key characteristics:
 
 ## 🧪 Experimental Setup
 
-- Candidate set size: `n = 200`
-- Objectives: `m = 3, 4, 5`
-- Subset size: `k = 5, 10, 15`
+### Design stage
+- Training candidate set size: `n = 200`
+- Objectives: `m = 4`
+- Subset size: `k = 8`
 - Population size: `10`
 - Generations: `15`
 - LLM: `DeepSeek-V3.2`
+
+### Generalization stage
+- Candidate set sizes: `n = 100, 200, 300`
+- Objectives: `m = 3, 4, 5`
+- Subset sizes: `k = 5, 10, 15`
+- Total test settings: `27`
 
 ------
 
@@ -100,25 +94,29 @@ Key characteristics:
 
 ------
 
-## 📁 Repository Structure (Example)
+## 📁 Repository Structure
 
-```
+```text
 .
-├── llm4ad/             # Core framework
-│   ├── base/           # Base classes and shared abstractions
-│   ├── method/         # Method implementations
-│   └── tools/          # Utility tools
-├── HV_cal/             # HSS baselines and HV evaluation
-│   ├── benchmark_hss_train.py
-│   ├── benchmark_hss_test.py
-│   └── GAHSS/GHSS/GL_HSS/GSI_LS/... baseline implementations
-├── data/               # Input datasets
-│   ├── train_data/     # Training instances
-│   └── test_data/      # Test instances
-├── example/            # Reproducible experiment scripts
-│   └── method_MEoH/    # MEoH/HSS-MEoH running and plotting examples
-├── LICENSE             # License file
-└── README.md           # Documentation
+├── data/
+├── HSS_benchmark/          # Baselines and benchmark scripts for HSS
+├── llm4ad/                 # Trimmed LLM4AD core used by MEoH
+│   ├── base/
+│   ├── method/
+│   │   └── meoh/
+│   └── tools/
+├── meoh_hss/
+│   ├── core/               # Evaluation/template helpers
+│   ├── scripts/            # Main experiment and evaluation scripts
+│   ├── plots/              # Plotting scripts
+│   └── results/
+│       ├── image/          # Generated figures
+│       ├── logs/           # Search logs and archives
+│       ├── result_code/    # Extracted discovered algorithms
+│       ├── test_result/    # Generalization results on test settings
+│       └── train_result/   # Design-stage / training-stage results
+├── LICENSE
+└── README.md
 ```
 
 ------
@@ -127,20 +125,32 @@ Key characteristics:
 
 ### 1. Install dependencies
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 ### 2. Run algorithm design
 
-```
-python run_evolution.py
+```bash
+python meoh_hss/scripts/run_meoh_hss.py
 ```
 
-### 3. Evaluate heuristics
+### 3. Extract discovered algorithms
 
+```bash
+python meoh_hss/scripts/extract_elitist_code.py
 ```
-python evaluate.py
+
+### 4. Evaluate heuristics on training instances
+
+```bash
+python HSS_benchmark/benchmark_hss_train.py
+```
+
+### 5. Evaluate heuristics on test instances
+
+```bash
+python HSS_benchmark/benchmark_hss_test.py
 ```
 
 ------
@@ -190,7 +200,7 @@ We sincerely thank the authors for their contributions to LLM-based automatic al
 
 If you find this work useful, please cite:
 
-```
+```bibtex
 @article{hss_meoh,
   title={Designing Hypervolume Subset Selection Algorithms with Large Language Models},
   author={Anonymous Authors},

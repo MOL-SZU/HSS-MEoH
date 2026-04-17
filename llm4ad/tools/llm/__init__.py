@@ -1,32 +1,25 @@
-import os
-import inspect
 import importlib
+import inspect
+import os
+
+from .llm_api_https import HttpsApi
+
+__all__ = ['HttpsApi', 'import_all_llm_classes_from_subfolders']
 
 
 def import_all_llm_classes_from_subfolders(root_directory):
-    """Dynamically imports all classes from Python files that share the same name as their parent folder.
-    Args:
-        root_directory (str): The root directory (e.g., 'method') to start the search.
-    """
-    # Iterate through the subdirectories
     for subdir in os.listdir(root_directory):
         module_path = os.path.join(root_directory, subdir)
-
-        if os.path.exists(module_path):
-            # Build the module name for importing (e.g., method.eoh.eoh)
-            module_name = f'{__name__}.{subdir}'.rstrip('.py')
-
-            # Dynamically import the module
-            if os.path.basename(module_path) != '__init__.py':
-                module = importlib.import_module(module_name)
-            else:
+        if os.path.basename(module_path) == '__init__.py':
+            continue
+        if os.path.isdir(module_path):
+            module_name = f'{__name__}.{subdir}'
+        else:
+            if not subdir.endswith('.py') or subdir == 'llm_api_https.py':
                 continue
-
-            # Import all classes from the module
-            for attribute_name in dir(module):
-                attribute = getattr(module, attribute_name)
-                if isinstance(attribute, type):  # Only import class objects
-                    # Use inspect to check if the class is defined in the current module
-                    if inspect.getmodule(attribute).__file__ == module.__file__:
-                        globals()[attribute_name] = attribute  # Add the class to the global namespace
-                        # print(f'Imported class {attribute_name} from {module_name}')
+            module_name = f'{__name__}.{subdir[:-3]}'
+        module = importlib.import_module(module_name)
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+            if isinstance(attribute, type) and inspect.getmodule(attribute).__file__ == module.__file__:
+                globals()[attribute_name] = attribute
