@@ -38,7 +38,7 @@ Instead of designing a single algorithm, HSS-MEoH discovers a **well-distributed
 
 * ⚙️ We incorporate three mechanisms, namely **Diverse Warm-Start Initialization (DWS-Init)**, **Reflective Evolution Mechanism (REM)**, and **Novelty-Weighted Parent Selection (NWPS)**, into the proposed framework, which together improve the quality, diversity, and search efficiency of the discovered non-dominated HSS algorithms.
 
-* 🧪 We conduct extensive experiments to show that the algorithms designed by **HSS-MEoH** consistently outperform those designed by **MEoH** and dominate most human-designed HSS algorithms in terms of performance and runtime trade-offs.
+* 🧪 We conduct extensive experiments to show that the algorithms designed by **HSS-MEoH** consistently outperform those designed by **MEoH** and most human-designed HSS algorithms in terms of performance and runtime trade-offs.
 
 ------
 
