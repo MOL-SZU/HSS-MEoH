@@ -1,4 +1,4 @@
-\\textbf{Due to the large size of the original paper, a compressed version was used when submitting it. The complete version can be downloaded from the current website - "Designing Hypervolume Subset Selection Algorithms with Large Language Models"}
+\textbf{Due to the large size of the original paper, a compressed version was used when submitting it. The complete version can be downloaded from the current website - "Designing Hypervolume Subset Selection Algorithms with Large Language Models"}
 
 # 🚀 HSS-MEoH: Designing Hypervolume Subset Selection Algorithms with Large Language Models
 
