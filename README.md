@@ -1,3 +1,5 @@
+Due to the large size of the original paper, a compressed version was used when submitting it. The complete version can be downloaded from the current website - "Designing Hypervolume Subset Selection Algorithms with Large Language Models"
+
 # 🚀 HSS-MEoH: Designing Hypervolume Subset Selection Algorithms with Large Language Models
 
 This repository contains the official implementation of **HSS-MEoH**, the first LLM-based framework for automatically designing Hypervolume Subset Selection (HSS) algorithms.
